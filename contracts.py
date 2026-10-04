@@ -22,6 +22,7 @@ class OrderProposal:         # procurement agent -> dashboard / Photon (iMessage
     unit_price: float        # MOCK catalog data
     lead_days: int
     reason: str              # plain-language why this supplier
-    status: str              # "auto_approved" | "needs_approval" | "approved" | "rejected"
+    status: str              # "needs_approval" | "approved" | "rejected" - no auto_approved, ever
     updated_at: float = 0.0  # unix seconds
+    product_url: str = ""    # MOCK link shown to the human before they approve (e.g. a fake Amazon product page)
     def to_json(self): return json.dumps(asdict(self))

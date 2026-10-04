@@ -37,6 +37,14 @@ class Baseline:
         w = int(np.abs(z).argmax())
         return {"health": health, "worst_band": self.bands[w], "z": z.round(1).tolist()}
 
+def derive_state(health: float) -> str:
+    """Fixed thresholds - keep in sync with index.ts's deriveState(), which is the authoritative copy."""
+    if health >= 70:
+        return "healthy"
+    if health >= 40:
+        return "warning"
+    return "critical"
+
 class Trend:
     """Linear extrapolation of recent health -> rough time-to-threshold. Label it an estimate in the pitch."""
     def __init__(self, replace_below=40.0, window=6):

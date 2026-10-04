@@ -13,5 +13,5 @@ s.propose_order(OrderProposal("drive_gear", "PrecisionMesh", 1, 58.0, 1, "99% on
 print("part_health:", s.latest_health())
 print("pending:", s.pending_orders())
 order_id = s.pending_orders()[0]["id"]   # use the real id (auto-increment ids are not guaranteed to start at 1)
-s.set_order_status(order_id, "approved")
+s.set_order_status(order_id, "approved", "Jose (smoke test)", "imessage")  # simulates what Photon does
 print("after approve:", s.all_orders())

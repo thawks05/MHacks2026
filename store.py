@@ -34,10 +34,19 @@ class Store:
 
     def propose_order(self, o: OrderProposal):
         self.call("propose_order", o.part, o.supplier, int(o.qty), float(o.unit_price), int(o.lead_days),
-                  o.reason, o.status, o.updated_at or time.time())
+                  o.reason, o.status, o.updated_at or time.time(), o.product_url)
 
-    def set_order_status(self, order_id: int, status: str):   # "approved" or "rejected"
-        self.call("set_order_status", int(order_id), status, time.time())
+    def set_order_status(self, order_id: int, status: str, approved_by: str, channel: str):
+        # "approved" or "rejected". channel MUST be "imessage" - the reducer rejects anything else.
+        # No Python agent should ever call this for real; it exists for store.py completeness and
+        # for smoke_test.py to exercise the reducer's own contract honestly.
+        self.call("set_order_status", int(order_id), status, time.time(), approved_by, channel)
+
+    def write_spectrum_reading(self, part: str, bands_json: str, z_scores_json: str, updated_at: float = None):
+        self.call("write_spectrum_reading", part, bands_json, z_scores_json, updated_at or time.time())
+
+    def open_observation_request(self, part: str, state: str, health: float, eta_s: float):
+        self.call("open_observation_request", part, state, float(health), float(eta_s), time.time())
 
     def reset_demo(self):
         self.call("reset_demo")
@@ -53,3 +62,59 @@ class Store:
     def latest_health(self):  return self.rows("SELECT * FROM part_health")
     def pending_orders(self): return self.rows("SELECT * FROM order_proposal WHERE status = 'needs_approval'")
     def all_orders(self):     return self.rows("SELECT * FROM order_proposal")
+
+    def approved_imessage_orders(self):
+        # What the Buyer polls for - the ONLY way an order's payment handshake ever starts, since
+        # Python can never call set_order_status itself (see the hard rule in CLAUDE.md).
+        return self.rows("SELECT * FROM order_proposal WHERE status = 'approved' AND channel = 'imessage'")
+
+    def open_observation_request_for(self, part: str):
+        rows = self.rows(f"SELECT * FROM observation_request WHERE part = '{part}' AND status != 'complete'")
+        return rows[0] if rows else None
+
+    def latest_observation_request_for(self, part: str):
+        rows = self.rows(f"SELECT * FROM observation_request WHERE part = '{part}'")
+        return max(rows, key=lambda r: r["id"]) if rows else None
+
+    def human_observations_for(self, observation_request_id: int):
+        rows = self.rows(f"SELECT * FROM human_observation WHERE observation_request_id = {int(observation_request_id)}")
+        return sorted(rows, key=lambda r: r["id"])
+
+    def write_diagnosis(self, part: str, observation_request_id: int, likely_cause: str,
+                         confidence: float, evidence_json: str, recommended_action: str):
+        self.call("write_diagnosis", part, int(observation_request_id), likely_cause,
+                  float(confidence), evidence_json, recommended_action, time.time())
+
+    def create_rfq(self, part: str, max_price: float, max_wait_days: float, priority: str) -> int:
+        self.call("create_rfq", part, float(max_price), float(max_wait_days), priority, time.time())
+        matches = [r for r in self.rows(f"SELECT * FROM rfq WHERE part = '{part}' AND status = 'collecting'")]
+        return max(matches, key=lambda r: r["id"])["id"]
+
+    def write_supplier_quote(self, rfq_id: int, supplier: str, available: bool, unit_price: float,
+                              lead_days: int, shipping_cost: float, counter_note: str, substitute_part: str):
+        self.call("write_supplier_quote", int(rfq_id), supplier, bool(available), float(unit_price),
+                  int(lead_days), float(shipping_cost), counter_note, substitute_part, time.time())
+
+    def complete_rfq(self, rfq_id: int, status: str):
+        self.call("complete_rfq", int(rfq_id), status, time.time())
+
+    def supplier_quotes_for(self, rfq_id: int):
+        return self.rows(f"SELECT * FROM supplier_quote WHERE rfq_id = {int(rfq_id)}")
+
+    def create_escalation(self, rfq_id: int, order_id: int, supplier: str, kind: str,
+                           offer_text: str, options_json: str):
+        self.call("create_escalation", int(rfq_id), int(order_id), supplier, kind,
+                  offer_text, options_json, time.time())
+
+    def open_escalations_for_rfq(self, rfq_id: int):
+        return self.rows(f"SELECT * FROM escalation WHERE rfq_id = {int(rfq_id)} AND status = 'open'")
+
+    def answered_escalations(self):
+        return self.rows("SELECT * FROM escalation WHERE status = 'answered'")
+
+    def heartbeat(self, agent_name: str, note: str = ""):
+        self.call("heartbeat", agent_name, note, time.time())
+
+    def log_event(self, agent: str, event_type: str, detail: str = "", part: str = "",
+                   order_id: int = -1, rfq_id: int = -1):
+        self.call("log_event", agent, event_type, part, int(order_id), int(rfq_id), detail, time.time())

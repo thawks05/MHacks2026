@@ -41,9 +41,10 @@ Photon's site says it doubles prizes won with its SDK. We have not verified the 
 ```
 
 - Fetch.ai uAgents on Agentverse for the agent chain.
-- Procurement auto-approves orders under a spend limit; above it, a human approves (shows autonomy plus trust).
-- **All supplier data is MOCK.** Say so in the pitch.
+- **Every order always needs a human yes/no, no exceptions, at any price** - there is no auto-approve path anywhere in the code. Approval is possible **only through the Photon/iMessage bridge**, enforced at the Spacetime reducer level (`set_order_status` requires `channel = "imessage"`, so ASI:One is structurally incapable of approving even with a code bug). Why iMessage-only: it puts a human physically at the machine in the loop, and a text reply is harder to misfire or social-engineer than a button in a chat window a bot could also be driving.
+- **All supplier data is MOCK.** Say so in the pitch. Product links shown before buying are REAL links to a generic matching part category (e.g. a real McMaster-Carr gear page) - not an exact match to the fictional mock supplier, just "here's roughly what this looks like" until real part data exists.
 - Time-to-failure is a rough linear **estimate**. Label it that way.
+- In ASI:One, start messages with **@pdm-analyst** - otherwise they go to your own generic assistant, not our agent.
 
 ---
 
@@ -52,7 +53,7 @@ Photon's site says it doubles prizes won with its SDK. We have not verified the 
 Defined in `contracts.py`:
 
 - `PartHealth(part, health 0-100, drift_lo_hz, drift_hi_hz, eta_s | None, updated_at)`
-- `OrderProposal(part, supplier, qty, unit_price, lead_days, reason, status, updated_at)` where status is `auto_approved | needs_approval | approved | rejected`
+- `OrderProposal(part, supplier, qty, unit_price, lead_days, reason, status, updated_at)` where status is `needs_approval | approved | rejected` (no `auto_approved`, ever)
 
 Plain dataclasses on purpose; port to `uagents.Model` with the same fields.
 
@@ -77,7 +78,7 @@ Files in `pdm/`:
 - `contracts.py`: message schemas.
 - `health.py`: Baseline (fit on 60 s healthy signal, scores new chunks via band energies and z-scores), Trend (ETA estimate).
 - `sim.py`: synthetic healthy/faulty signal so we can build before the rig is ready.
-- `suppliers.py`: MOCK catalog, `rank()` and `propose()` with auto-approve limit.
+- `suppliers.py`: MOCK per-supplier catalog (`SUPPLIER_CATALOG`, 7 suppliers) and `score_quotes()`, which ranks live RFQ replies from the supplier swarm (`suppliers_swarm.py`) - never a single static lookup. Always proposes `needs_approval` (see note above).
 - `demo_pipeline.py`: end to end: baseline, fault ramp, health drop, order proposal.
 - `spacetimedb/index.ts`: the Spacetime tables (`part_health`, `health_log`, `order_proposal`) and reducers (`report_health`, `propose_order`, `set_order_status`, `reset_demo`). Type-checked, not yet run against a live server.
 - `store.py`: Python helper that writes to and reads from Spacetime over HTTP. `smoke_test.py` exercises it.
@@ -148,5 +149,15 @@ Run it: `pip install numpy && python demo_pipeline.py`
 3. In a SECOND PowerShell window (keep it open): `spacetime start`. If it says it failed to bind to port 3000, run `wsl --shutdown` and retry.
 4. From the `pdm` project folder: `spacetime publish --server local --module-path spacetimedb pdm`  (the flag is `--module-path`, not `--project-path`).
 5. Extract the code zip to a DIFFERENT folder than the project (for example `Documents\pdm-code`), `cd` into it, and run `python smoke_test.py`.
+
+---
+
+## 12. Future ideas (not building now)
+
+- **Repair-vs-replace tradeoff.** Right now the Buyer only ever sources a replacement part.
+  A future version would also estimate the cost to repair/fix the existing part and how much
+  usable life that repair buys back, then compare: if repair cost + the value of that bought-back
+  life is higher than just buying new, replace it; if lower, repair it instead. Lets the Buyer
+  avoid spending money on a new part when a cheaper fix would do.
 
 `eta_s` is stored as -1 when there is no estimate. Argument order for reducer calls over HTTP follows the field order in `index.ts`.

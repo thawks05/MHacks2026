@@ -2,3 +2,7 @@
 node_modules/
 __pycache__/
 spacetimedb/dist/
+venv/
+photon/local_store.json
+photon/src/module_bindings/
+photon/dist/
