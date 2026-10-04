@@ -1,0 +1,91 @@
+{
+ "baselines": {
+  "conveyor_17_phx_az/drive_motor": {
+   "mean": {
+    "rms_g": 0.009391087809080673,
+    "peak_g": 0.02556391194661458,
+    "crest": 4.021627156669968,
+    "kurtosis": 4.815111472542691,
+    "dom_freq_hz": 12.958715618208084,
+    "band_low_g": 0.007331308827300011,
+    "band_mid_g": 0.0035375564991570433,
+    "band_high_g": 0.0028286462994786135
+   },
+   "std": {
+    "rms_g": 0.006076962095010257,
+    "peak_g": 0.026898790993023235,
+    "crest": 1.5583587856347487,
+    "kurtosis": 6.5558381432139345,
+    "dom_freq_hz": 12.56570591665815,
+    "band_low_g": 0.006791123806402954,
+    "band_mid_g": 0.0011972032939272573,
+    "band_high_g": 0.002467200506329447
+   },
+   "n_windows": 60,
+   "fs": 1000.0,
+   "created_ts": 1791097559.2129998
+  }
+ },
+ "active_alerts": {
+  "conveyor_17_phx_az/drive_motor": {
+   "alert_id": "eb62baa7f665",
+   "slot_id": "conveyor_17_phx_az/drive_motor",
+   "alert_status": "active",
+   "severity": "degraded",
+   "agent_notification_stage": "open",
+   "opened_ts": 1791097577.2129998,
+   "updated_ts": 1791097587.2129998,
+   "evidence": {
+    "health": 0.0,
+    "top_deviations": [
+     [
+      "rms_g",
+      139.2935
+     ],
+     [
+      "band_low_g",
+      134.7611
+     ],
+     [
+      "peak_g",
+      53.1879
+     ]
+    ],
+    "vs_baseline": {
+     "rms_g": {
+      "baseline": 0.0094,
+      "now": 0.8559,
+      "z": 139.2935
+     },
+     "peak_g": {
+      "baseline": 0.0256,
+      "now": 1.4563,
+      "z": 53.1879
+     },
+     "crest": {
+      "baseline": 4.0216,
+      "now": 4.2372,
+      "z": 0.1383
+     },
+     "kurtosis": {
+      "baseline": 4.8151,
+      "now": 2.8576,
+      "z": -0.2986
+     },
+     "dom_freq_hz": {
+      "baseline": 12.9587,
+      "now": 4.6636,
+      "z": -0.6601
+     }
+    },
+    "eta": {
+     "demo_s": 0.0,
+     "runtime_hours": 0.0,
+     "shifts": 0.0,
+     "calendar_estimate": "2026-10-05T09:00",
+     "label": "rough linear estimate, simulated shift time"
+    }
+   }
+  }
+ }
+}
