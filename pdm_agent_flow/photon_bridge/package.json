@@ -1,0 +1,11 @@
+{
+  "name": "pdm-photon-bridge",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "tsx bridge.ts" },
+  "dependencies": {
+    "@photon-ai/imessage-kit": "^3.0.0",
+    "better-sqlite3": "^12.5.0"
+  },
+  "devDependencies": { "tsx": "^4.19.0", "typescript": "^5.6.0", "@types/node": "^22.0.0" }
+}
