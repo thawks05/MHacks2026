@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Forge Flow predictive-maintenance operations dashboard" />
+    <title>Forge Flow — Operations</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="operations.css" />
+    <link rel="stylesheet" href="live.css" />
+  </head>
+  <body>
+    <div class="dashboard-shell">
+      <aside class="system-rail" aria-label="System navigation and component status">
+        <a class="rail-brand" href="#overview" aria-label="Forge Flow operations dashboard">
+          <img src="assets/forge-flow-logo.png" alt="Forge Flow" />
+        </a>
+
+        <div class="environment-line">
+          <span class="live-dot"></span>
+          <div><small>Environment</small><strong>Maincloud · pdm</strong></div>
+        </div>
+
+        <nav class="rail-nav" aria-label="Dashboard sections">
+          <a class="active" href="#overview"><span>Overview</span><small>System state</small></a>
+          <a href="#calibration"><span>Calibration</span><small>60-second baseline</small></a>
+          <a href="#signals"><span>Signals</span><small>Features and score</small></a>
+          <a href="#incident"><span>Incident</span><small>Operator-controlled</small></a>
+          <a href="#agents"><span>Agents</span><small>10-agent network</small></a>
+          <a href="#pods"><span>Pod</span><small>Hardware path</small></a>
+          <a href="#procurement"><span>Procurement</span><small>7 supplier agents</small></a>
+          <a href="#database"><span>Database</span><small>Tables and rules</small></a>
+        </nav>
+
+        <div class="rail-scroll">
+          <section class="rail-cluster" aria-labelledby="agent-rail-title">
+            <div class="rail-section-title"><span id="agent-rail-title">Runtime</span><b>10 agents</b></div>
+            <div class="runtime-list">
+              <div><i class="status-dot active" id="dot-watcher"></i><span>Watcher</span><small id="rail-watcher">sensing</small></div>
+              <div><i class="status-dot active" id="dot-analyst"></i><span>Analyst</span><small id="rail-analyst">ready</small></div>
+              <div><i class="status-dot standby" id="dot-buyer"></i><span>Buyer</span><small id="rail-buyer">standby</small></div>
+              <div><i class="status-dot active"></i><span>Supplier swarm</span><small id="rail-suppliers">7 / 7</small></div>
+            </div>
+          </section>
+
+          <section class="rail-cluster technology-cluster" aria-labelledby="services-rail-title">
+            <div class="rail-section-title"><span id="services-rail-title">Ecosystem</span><b>connected stack</b></div>
+            <div class="brand-stack" aria-label="Forge Flow technology ecosystem">
+              <div class="brand-lockup dimension-brand"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 7 7-4 7 4v10l-7 4-7-4Z"/><path d="m5 7 7 4 7-4M12 11v10"/></svg></i><strong>dimension</strong></div>
+              <div class="brand-lockup spacetime-brand"><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M4.2 9.2C6.5 4.5 13 2.7 17.8 5.4M19.8 14.8c-2.3 4.7-8.8 6.5-13.6 3.8"/><path d="m16 4.4 2.2 1-1 2.2M8 19.6l-2.2-1 1-2.2"/></svg></i><strong>SpacetimeDB</strong></div>
+              <div class="brand-lockup asi-brand"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><circle cx="17" cy="17" r="3"/></svg></i><strong>ASI:One</strong></div>
+              <div class="brand-lockup photon-brand"><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="9" ry="4.7"/><ellipse cx="12" cy="12" rx="4.7" ry="9" transform="rotate(35 12 12)"/></svg></i><strong>photon</strong></div>
+            </div>
+          </section>
+
+          <section class="pod-mini" aria-label="Pod 1 status">
+            <div><span>Pod 01</span><b id="rail-pod-mode">idle</b></div>
+            <strong>conveyor_17_phx_az</strong>
+            <small>drive_motor → drive_gear</small>
+            <div class="pod-signal"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </section>
+        </div>
+
+        <div class="rail-note">
+          <strong>Integrated branch · 6cd0425</strong>
+          <p>Simulator and Maincloud loop verified. Real ESP32 serial path is written but not yet verified.</p>
+        </div>
+      </aside>
+
+      <div class="workspace">
+        <header class="workspace-bar">
+          <div><span>Internal operations</span><strong>Conveyor 17 · Phoenix line</strong></div>
+          <div class="source-controls">
+            <span class="live-status" id="live-status">Connecting…</span>
+            <label class="demo-toggle"><input id="live-mode" type="checkbox" checked /><span></span>Live data</label>
+            <label class="demo-toggle local-only"><input id="demo-mode" type="checkbox" checked /><span></span>Simulator</label>
+            <button class="usb-button local-only" id="usb-button" type="button"><i></i><span id="usb-label">Connect host ESP32</span></button>
+          </div>
+        </header>
+
+        <main>
+          <section id="overview" class="overview-section anchor-section">
+            <div class="overview-copy">
+              <p>Live machine record</p>
+              <h1>Drive gear intelligence,<br />from vibration to resolution.</h1>
+              <span>A GY-6500 pod learns a healthy baseline, the Watcher opens one durable incident, and the operator remains in control through every diagnosis, purchase, and resolution.</span>
+            </div>
+            <div class="session-state">
+              <span id="session-state-dot"></span>
+              <div><small>Session state</small><strong id="session-state-label">Ready to calibrate</strong><em id="session-substate">Pod 01 · idle</em></div>
+            </div>
+          </section>
+
+          <section class="system-strip" aria-label="System overview">
+            <div><span>Sensor source</span><strong id="source-summary">Simulated motor</strong><small>1,000 samples / second</small></div>
+            <div><span>Monitored part</span><strong>drive_gear</strong><small>Slot: drive_motor</small></div>
+            <div><span>Agent network</span><strong id="network-online">10 online</strong><small>Watcher + Analyst + Buyer + 7 suppliers</small></div>
+            <div><span>Human control</span><strong>Required</strong><small>YES orders · RESOLVED closes</small></div>
+          </section>
+
+          <section id="calibration" class="anchor-section section-block">
+            <div class="section-heading">
+              <div><p>Calibration and monitoring</p><h2>Learn this machine’s normal</h2></div>
+              <p>The baseline uses 60 healthy one-second windows. Quiet windows below 0.003 g RMS are rejected so an off motor cannot become the reference.</p>
+            </div>
+
+            <div class="run-console">
+              <article class="run-step active" id="baseline-step">
+                <div class="step-number">01</div>
+                <div class="step-copy"><span>Pod mode: training</span><h3>Build the 60-second baseline</h3><p>Fit the mean and a guarded standard deviation for every vibration feature.</p></div>
+                <div class="step-progress"><div class="timer"><strong id="baseline-timer">00:00</strong><span>/ 01:00</span></div><div class="progress-track"><i id="baseline-progress"></i></div><small id="sample-count">0 healthy windows accepted</small></div>
+                <button class="primary-action" id="baseline-button" type="button">Run baseline</button>
+              </article>
+              <article class="run-step disabled" id="monitor-step">
+                <div class="step-number">02</div>
+                <div class="step-copy"><span>Pod mode: monitoring</span><h3>Score each one-second window</h3><p>Compare the live feature vector with its baseline and hold status changes until the drift persists.</p></div>
+                <div class="monitor-status"><small>Current state</small><strong id="monitor-state">Waiting for baseline</strong><span id="monitor-duration">00:00 runtime</span></div>
+                <button class="secondary-action" id="monitor-button" type="button" disabled>Start monitoring</button>
+              </article>
+            </div>
+
+            <div class="capture-panel" id="capture-panel" aria-live="polite">
+              <div class="capture-heading"><div><span>One-second feature window</span><strong id="capture-status">Sampling healthy vibration</strong></div><div class="sampling"><i></i>Local pipeline</div></div>
+              <div class="feature-stream">
+                <article><span>Vibration RMS</span><strong id="capture-rms">—</strong><small>g</small><div class="mini-trace" id="trace-rms"></div></article>
+                <article><span>Peak acceleration</span><strong id="capture-peak">—</strong><small>g</small><div class="mini-trace" id="trace-peak"></div></article>
+                <article><span>Dominant frequency</span><strong id="capture-frequency">—</strong><small>Hz</small><div class="mini-trace" id="trace-frequency"></div></article>
+                <article><span>Impulsiveness</span><strong id="capture-kurtosis">—</strong><small>kurtosis</small><div class="mini-trace" id="trace-kurtosis"></div></article>
+              </div>
+            </div>
+
+            <div class="baseline-summary" id="baseline-summary" hidden>
+              <div class="capture-heading"><div><span>Saved reference</span><strong>Healthy baseline fitted</strong></div><div class="saved-badge">60 windows · accepted</div></div>
+              <div class="baseline-values">
+                <div><span>RMS mean</span><strong id="baseline-rms">—</strong><small>g</small></div>
+                <div><span>Peak mean</span><strong id="baseline-peak">—</strong><small>g</small></div>
+                <div><span>Shaft signature</span><strong id="baseline-frequency">—</strong><small>Hz</small></div>
+                <div><span>Kurtosis mean</span><strong id="baseline-kurtosis">—</strong><small>Gaussian ≈ 3</small></div>
+              </div>
+            </div>
+          </section>
+
+          <section id="signals" class="anchor-section section-block">
+            <div class="section-heading">
+              <div><p>Signal pipeline</p><h2>Deviation, persistence, and health</h2></div>
+              <p>Health is a log mapping of the worst absolute z-score. It is an interpretable demo score—not a calibrated failure probability.</p>
+            </div>
+
+            <div class="signal-layout">
+              <article class="health-console">
+                <div class="health-ring" id="health-ring"><span id="health-value">—</span><small>%</small></div>
+                <div><span>Calculated health</span><h3 id="health-label">No scored window</h3><p id="health-explanation">Complete training before live windows can be scored.</p><small class="honesty-note">Uncalibrated score · worst |z| drives health</small></div>
+              </article>
+
+              <article class="hold-ladder">
+                <div class="ladder-heading"><span>Status hold rule</span><strong id="deviation-count">0 consecutive deviating windows</strong></div>
+                <div class="ladder-track"><i id="hold-progress"></i><b class="mark watch" style="left:33%"></b><b class="mark degraded" style="left:66%"></b><b class="mark critical" style="left:100%"></b></div>
+                <div class="ladder-labels"><span>Healthy<small>0–9</small></span><span>Watch<small>10 windows</small></span><span>Degraded<small>20 windows</small></span><span>Critical<small>30 windows</small></span></div>
+              </article>
+            </div>
+
+            <div class="comparison-grid">
+              <article class="comparison-card" data-metric="rms"><div class="metric-purpose"><span>Vibration RMS</span><small>Total mechanical energy across X, Y, and Z.</small></div><div class="compare-values"><div><span>Baseline</span><strong id="compare-rms-base">—</strong></div><div><span>Current</span><strong id="compare-rms-current">—</strong></div></div><div class="deviation-line"><i id="bar-rms"></i><b id="deviation-rms">—</b></div></article>
+              <article class="comparison-card" data-metric="frequency"><div class="metric-purpose"><span>Dominant frequency</span><small>Tracks shaft rate; the simulated obstruction slows 48 Hz toward 44 Hz.</small></div><div class="compare-values"><div><span>Baseline</span><strong id="compare-frequency-base">—</strong></div><div><span>Current</span><strong id="compare-frequency-current">—</strong></div></div><div class="deviation-line"><i id="bar-frequency"></i><b id="deviation-frequency">—</b></div></article>
+              <article class="comparison-card" data-metric="peak"><div class="metric-purpose"><span>Peak acceleration</span><small>Captures the largest excursion from an impact or loose component.</small></div><div class="compare-values"><div><span>Baseline</span><strong id="compare-peak-base">—</strong></div><div><span>Current</span><strong id="compare-peak-current">—</strong></div></div><div class="deviation-line"><i id="bar-peak"></i><b id="deviation-peak">—</b></div></article>
+              <article class="comparison-card" data-metric="kurtosis"><div class="metric-purpose"><span>Kurtosis</span><small>Rises when once-per-revolution impacts make the signal more impulsive.</small></div><div class="compare-values"><div><span>Baseline</span><strong id="compare-kurtosis-base">—</strong></div><div><span>Current</span><strong id="compare-kurtosis-current">—</strong></div></div><div class="deviation-line"><i id="bar-kurtosis"></i><b id="deviation-kurtosis">—</b></div></article>
+            </div>
+
+            <div class="spectrum-console">
+              <div class="spectrum-copy"><span>Welch spectrum · 512-sample Hann segments</span><h3>Band z-scores</h3><p>The bands are placeholders until the real rig is recorded. Gear impacts in the simulator ring near 300 Hz.</p></div>
+              <div class="band-bars">
+                <div><span>Low · 2–60 Hz</span><i><b id="band-low"></b></i><strong id="band-low-value">0.0σ</strong></div>
+                <div><span>Mid · 60–200 Hz</span><i><b id="band-mid"></b></i><strong id="band-mid-value">0.0σ</strong></div>
+                <div><span>High · 200–450 Hz</span><i><b id="band-high"></b></i><strong id="band-high-value">0.0σ</strong></div>
+              </div>
+              <div class="eta-block"><span>Rough time to health 20</span><strong id="eta-value">Not enough decline</strong><small>Straight-line estimate · 60 demo seconds = one 8-hour shift</small></div>
+            </div>
+          </section>
+
+          <section id="incident" class="anchor-section section-block">
+            <div class="section-heading">
+              <div><p>Incident control</p><h2>One durable record, closed by a person</h2></div>
+              <p>Returning to healthy changes the display, but never closes an incident. Only an inbound text such as RESOLVED, fixed, replaced, cleared, or running clean can do that; the Photon bridge admits only the configured operator number.</p>
+            </div>
+
+            <div class="incident-console" id="incident-console">
+              <div class="incident-primary"><span id="incident-state">No open incident</span><h3 id="incident-title">Monitoring has not started</h3><p id="incident-detail">At watch, the Watcher opens an incident and pushes a PartAlert to the Analyst.</p></div>
+              <div class="incident-ledger">
+                <div><span>Incident</span><strong id="incident-id">—</strong></div>
+                <div><span>Part</span><strong>drive_gear</strong></div>
+                <div><span>Worst health</span><strong id="incident-health">—</strong></div>
+                <div><span>Resolution authority</span><strong>Operator text only</strong></div>
+              </div>
+            </div>
+
+            <div class="lifecycle">
+              <div class="lifecycle-step active"><i></i><span>Watch</span><strong>Watcher opens one incident</strong><small>After 10 deviating windows</small></div>
+              <div class="lifecycle-step"><i></i><span>Observe</span><strong>Analyst texts the operator</strong><small>Evidence + rough ETA</small></div>
+              <div class="lifecycle-step"><i></i><span>Decide</span><strong>Diagnose and choose action</strong><small>Clear · adjust · repair · replace</small></div>
+              <div class="lifecycle-step"><i></i><span>Resolve</span><strong>Operator texts RESOLVED</strong><small>Database checks the sender and the inbound row</small></div>
+              <div class="lifecycle-step"><i></i><span>Retrain</span><strong>Fresh 60-second baseline</strong><small>New part, new normal</small></div>
+            </div>
+          </section>
+
+          <section id="agents" class="anchor-section section-block">
+            <div class="section-heading">
+              <div><p>Runtime network</p><h2>Who acts, and exactly when</h2></div>
+              <p>uAgents messages handle work that must happen now. SpacetimeDB holds everything that must be durable, visible, or enforced.</p>
+            </div>
+
+            <div class="agent-ledger">
+              <div class="agent-row featured"><div class="agent-identity"><i class="agent-mark watcher" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 5v7l5 3"/><path d="M4.5 6.5 7 9M19.5 6.5 17 9"/></svg></i><div><strong>Watcher</strong><small>uAgent · port 8002</small></div></div><div><span>State</span><strong id="watcher-state">Active · sensing</strong></div><div><span>Activated</span><strong>At run start</strong><small>Drains sensor queue every 0.25 s</small></div><div><span>Responsibility</span><p>Runs the pipeline, writes health and spectrum every second, opens or escalates one incident, and starts retraining after resolution.</p></div></div>
+              <div class="agent-row"><div class="agent-identity"><i class="agent-mark analyst" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 15h3l2-6 3 10 2-7 2 3h4"/><circle cx="17.5" cy="6.5" r="2.5"/><path d="m19.4 8.4 2.1 2.1"/></svg></i><div><strong>Analyst</strong><small>uAgent · port 8001</small></div></div><div><span>State</span><strong id="analyst-state">Ready</strong></div><div><span>Activated</span><strong>On PartAlert</strong><small>Polls operator replies every second</small></div><div><span>Responsibility</span><p>The only agent that texts the operator. Saves observations, diagnoses, explains options, handles escalation, and requests YES or NO.</p></div></div>
+              <div class="agent-row"><div class="agent-identity"><i class="agent-mark buyer" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3.5 5h2l1.6 9.2h10.8l1.8-6.1H6.2"/><circle cx="9" cy="18.5" r="1.2"/><circle cx="17" cy="18.5" r="1.2"/><path d="M11 11h4M13 9v4"/></svg></i><div><strong>Buyer</strong><small>uAgent · port 8003</small></div></div><div><span>State</span><strong id="buyer-state">Standby</strong></div><div><span>Activated</span><strong>On SourceRequest</strong><small>Collects replies for up to 8 s</small></div><div><span>Responsibility</span><p>Creates the RFQ, fans it to seven suppliers, ranks price versus lead time, escalates exceptions, and runs simulated payment after approval.</p></div></div>
+              <div class="agent-row"><div class="agent-identity"><i class="agent-mark suppliers" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="17" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="19" cy="17" r="2"/><path d="m12 7-7 8m7-8v10m0-10 7 8M7 17h3m4 0h3"/></svg></i><div><strong>Supplier swarm</strong><small>ports 8101–8107</small></div></div><div><span>State</span><strong>7 / 7 listening</strong></div><div><span>Activated</span><strong>On RFQRequest</strong><small>Scatter-gather in parallel</small></div><div><span>Responsibility</span><p>Returns mock price, lead time, stock, counters, or substitutes. Each supplier has a fixed behavior and catalog.</p></div></div>
+            </div>
+
+            <div class="service-ledger">
+              <article><div class="service-title"><i class="service-logo photon-service" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="9" ry="4.7"/><ellipse cx="12" cy="12" rx="4.7" ry="9" transform="rotate(35 12 12)"/></svg></i><div><span>Messaging transport</span><h3>Photon bridge</h3></div></div><strong>Connected · 1 s send loop</strong><p>A direct pipe between database message queues and Messages.app. Diagnosis and approval logic stay outside the bridge.</p></article>
+              <article><div class="service-title"><i class="service-logo spacetime-service" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M4.2 9.2C6.5 4.5 13 2.7 17.8 5.4M19.8 14.8c-2.3 4.7-8.8 6.5-13.6 3.8"/><path d="m16 4.4 2.2 1-1 2.2M8 19.6l-2.2-1 1-2.2"/></svg></i><div><span>Rules and shared state</span><h3>SpacetimeDB</h3></div></div><strong>Maincloud · pdm</strong><p>Reducers verify the inbound message, YES or NO first word, order state, and open incident before durable state changes.</p></article>
+              <article><div class="service-title"><i class="service-logo asi-service" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><circle cx="17" cy="17" r="3"/></svg></i><div><span>Read-only interface</span><h3>ASI:One</h3></div></div><strong>@pdm-analyst</strong><p>Answers health, evidence, risk, and order-history questions. Approval, rejection, and resolution stay in iMessage.</p></article>
+            </div>
+          </section>
+
+          <section id="pods" class="anchor-section section-block">
+            <div class="section-heading">
+              <div><p>Hardware and pod</p><h2>One sensor path, no hidden conversion</h2></div>
+              <p>The GY-6500 uses only its three-axis accelerometer. The pod sends every sample wirelessly; the host ESP32 prints one CSV line per sample over USB.</p>
+            </div>
+
+            <div class="hardware-path">
+              <div><i>01</i><span>Machine</span><strong>Conveyor motor</strong><small>Demo fault: glue or plastic on drive gear</small></div><b>I²C</b>
+              <div><i>02</i><span>Sensor pod</span><strong>GY-6500 + ESP32</strong><small>3-axis acceleration at 3.3 V</small></div><b>ESP-NOW</b>
+              <div><i>03</i><span>Host</span><strong>ESP32 receiver</strong><small>Wireless samples → serial CSV</small></div><b>USB</b>
+              <div><i>04</i><span>Mac pipeline</span><strong>dsp.py + pipeline.py</strong><small>1 s windows · baseline · score</small></div>
+            </div>
+
+            <div class="pod-detail-grid">
+              <article class="pod-identity-card"><div class="pod-detail-head"><div class="pod-identity"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/><path d="M9 9h6v6H9zM2 9h3m14 0h3M2 15h3m14 0h3M9 2v3m6-3v3M9 19v3m6-3v3"/></svg></i><div><small>Wireless sensor node</small><span>Pod 01</span></div></div><strong id="pod-mode-main">Idle</strong></div><h3>conveyor_17_phx_az/drive_motor</h3><div class="pod-link-state"><i></i><span>ESP-NOW link ready</span><b>host 01</b></div><dl><div><dt>Mapped part</dt><dd>drive_gear</dd></div><div><dt>Sample rate</dt><dd>~1,000 Hz</dd></div><div><dt>Baud</dt><dd>921600</dd></div><div><dt>Scale</dt><dd>8192 counts / g</dd></div></dl></article>
+              <article class="serial-contract"><span>Host serial contract</span><code>pod_id,sample_idx,x,y,z</code><p>A missing sample index drops the partial one-second window. Raw int16 values are converted to g; decimal values are treated as g already.</p><div class="caveat"><i></i><span>Real serial path written, not yet verified against the physical ESP32.</span></div></article>
+            </div>
+          </section>
+
+          <section id="procurement" class="anchor-section section-block">
+            <div class="section-heading">
+              <div><p>Latest demo decision</p><h2>Seven quotes, one operator-approved outcome</h2></div>
+              <p>All supplier names, prices, stock, and lead times are mock. The comparison below uses the project’s drive-gear catalog and the documented $60 / 3-day / speed preference.</p>
+            </div>
+
+            <div class="decision-banner">
+              <div><span>Analyst recommendation</span><h3 id="dec-reco">Replace the drive gear</h3><p id="dec-reco-detail">Purchase path selected after the operator reviewed clear, adjust, repair, and replace options.</p></div>
+              <div><span>Operator limits</span><strong id="dec-limits">$60 maximum</strong><small id="dec-limits-detail">3 days · speed first</small></div>
+              <div><span>Buyer result</span><strong id="dec-buyer">PrecisionMesh</strong><small id="dec-buyer-detail">$58 · 1-day lead</small></div>
+              <div class="approved-result" id="dec-decision-box"><span>Database decision</span><strong id="dec-decision">Approved</strong><small id="dec-decision-detail">“yes please” via iMessage</small></div>
+            </div>
+
+            <div class="procurement-layout">
+              <div class="supplier-board">
+                <div class="board-header"><div><span id="rfq-label">RFQ #1 · mock supplier data</span><h3 id="rfq-title">All seven responses</h3></div><span class="priority-chip" id="rfq-priority">Ranked by speed, then price</span></div>
+                <div class="supplier-table" id="supplier-table" role="table" aria-label="Seven mock supplier quotes">
+                  <div class="supplier-row supplier-head" role="row"><span>Supplier</span><span>Behavior</span><span>Lead</span><span>Unit</span><span>Outcome</span></div>
+                  <div class="supplier-row selected" role="row"><strong>PrecisionMesh<small>Picked</small></strong><span>Plain quote</span><span>1 day</span><span>$58</span><b>Fastest clean fit</b></div>
+                  <div class="supplier-row" role="row"><strong>NorthGear Co</strong><span>Plain quote</span><span>2 days</span><span>$42</span><b>Meets limits</b></div>
+                  <div class="supplier-row" role="row"><strong>SouthBearing</strong><span>Plain quote</span><span>3 days</span><span>$45</span><b>Meets limits</b></div>
+                  <div class="supplier-row" role="row"><strong>FlexDrive</strong><span>Counter if needed</span><span>3 days</span><span>$47</span><b>Meets limits</b></div>
+                  <div class="supplier-row" role="row"><strong>ShaftPro</strong><span>5 s reply</span><span>3 days</span><span>$50</span><b>Meets limits</b></div>
+                  <div class="supplier-row" role="row"><strong>MetroSupply</strong><span>15% substitute</span><span>4 days</span><span>$34</span><b>Human review</b></div>
+                  <div class="supplier-row" role="row"><strong>BulkParts Ltd</strong><span>Plain quote</span><span>7 days</span><span>$31</span><b>Misses wait limit</b></div>
+                </div>
+              </div>
+
+              <aside class="procurement-rules">
+                <span>Human escalation gate</span><h3 id="escalation-title">No negotiation was needed for the selected quote.</h3><p>If the best result is a counteroffer, substitute, or misses the operator’s limits, the Buyer pauses and the Analyst texts three choices:</p><ol><li>Accept this offer</li><li>Try the next best</li><li>Cancel sourcing</li></ol><div><strong>Approval is separate.</strong><p>Even a clean quote remains <code>needs_approval</code> until SpacetimeDB receives a short, clear YES texted from the operator’s number.</p></div>
+              </aside>
+            </div>
+
+            <div class="conversation-layout">
+              <article class="conversation-summary">
+                <div class="board-header"><div><span>Conversation summary</span><h3>From observation to retraining</h3></div><span class="mock-badge" id="events-badge">Latest completed demo</span></div>
+                <ol class="conversation-events" id="conversation-events">
+                  <li><time>10:36</time><i></i><div><strong>Watcher → Analyst</strong><p>Incident #1 opened at watch after 10 consecutive deviating windows.</p></div></li>
+                  <li><time>10:37</time><i></i><div><strong>Operator observation</strong><p>“Something plastic is stuck in the gear.” Saved as an operator note and cited in diagnosis.</p></div></li>
+                  <li><time>10:38</time><i></i><div><strong>Analyst diagnosis</strong><p>Obstruction, 75% confidence. Clear obstruction is the no-cost first option; the operator chose replacement.</p></div></li>
+                  <li><time>10:39</time><i></i><div><strong>Buyer + suppliers</strong><p>Seven RFQs returned within the 8-second window. PrecisionMesh won on speed within the $60 limit.</p></div></li>
+                  <li><time>10:40</time><i></i><div><strong>Database approval</strong><p>“wait—not yet” was refused. “yes please” began with a recognized YES word; the payment handshake was simulated.</p></div></li>
+                  <li><time>10:46</time><i></i><div><strong>Operator resolution</strong><p>“fixed” closed the incident. Watcher cleared the simulated fault and began a new 60-second baseline.</p></div></li>
+                </ol>
+              </article>
+
+              <aside class="phone-stage" aria-label="iMessage conversation with the Plant Concierge">
+                <div class="phone-caption"><span>Only the Analyst writes these messages</span><strong>Photon / iMessage</strong></div>
+                <div class="phone-shell" id="phone-conversation">
+                  <div class="phone-hardware"><span></span></div>
+                  <div class="phone-screen">
+                    <div class="message-header"><button type="button" aria-label="Back">‹</button><div class="agent-avatar">FF</div><strong>Plant Concierge<small>iMessage</small></strong><span>•••</span></div>
+                    <div class="message-day" id="message-day">Today 10:36 AM</div>
+                    <div class="messages" id="phone-messages">
+                      <div class="bubble incoming">⚠️ WATCH: drive_gear is at 78% health (incident #1). The high band is +4.6σ from baseline. What do you see, hear, or feel?</div>
+                      <div class="bubble outgoing">Something plastic is stuck in the gear.</div>
+                      <div class="bubble incoming">Likely obstruction, 75% confidence. First option: clear it with no purchase. You chose replace. Market range is $31–$58 and 1–7 days. Max price, wait, and priority?</div>
+                      <div class="bubble outgoing">$60, 3 days, speed.</div>
+                      <div class="bubble incoming">I asked all 7 suppliers.<span class="message-offer"><b>PrecisionMesh · mock quote</b><strong>$58 · 1-day lead</strong><small>Fastest clean fit · order #1</small></span>Reply YES to order it or NO.</div>
+                      <div class="bubble outgoing rejected-reply">wait—not yet</div>
+                      <div class="bubble incoming">Reply YES to order #1 or NO to reject it.</div>
+                      <div class="bubble outgoing approval-reply">yes please</div>
+                      <div class="bubble incoming confirmation">📦 Ordered (simulated). Install it, then text RESOLVED.</div>
+                    </div>
+                    <div class="message-input"><span>＋</span><div>iMessage</div><button type="button" aria-label="Send message">↑</button></div>
+                    <div class="home-indicator"></div>
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </section>
+
+          <section id="database" class="anchor-section section-block">
+            <div class="section-heading">
+              <div><p>Shared state and rules</p><h2>SpacetimeDB is the judge</h2></div>
+              <p>Agents communicate directly for immediate work, then write durable evidence and decisions into the shared incident record.</p>
+            </div>
+
+            <div class="database-grid">
+              <article><span>Sensor and pod</span><div class="table-tags"><b>pod_window</b><b>part_health</b><b>health_log</b><b>spectrum_reading</b><b>pod_status</b></div><p>Latest state, history, band z-scores, ETA, and whether the pod is idle, training, or monitoring.</p></article>
+              <article><span>Incident reasoning</span><div class="table-tags"><b>incident</b><b>operator_note</b><b>diagnosis</b><b>agent_event</b><b>agent_status</b></div><p>The failure record, exact operator observations, evidence, confidence, recommended action, event history, and agent heartbeats.</p></article>
+              <article><span>Sourcing and order</span><div class="table-tags"><b>rfq</b><b>supplier_quote</b><b>escalation</b><b>order_proposal</b></div><p>Every quote and human exception. Orders can only be needs_approval, approved, or rejected.</p></article>
+              <article><span>Phone and identity</span><div class="table-tags"><b>outbound_message</b><b>inbound_message</b><b class="private">operator_config · private</b><b>observation_request · legacy</b><b>human_observation · legacy</b></div><p>The operator number is not stored in SpacetimeDB. The bridge compares its last 10 digits before writing an inbound message; the earlier interview tables remain in the schema but are not used by the integrated incident flow.</p></article>
+            </div>
+
+            <div class="rule-strip">
+              <div><span>Open incident</span><strong>Only watch, degraded, or critical</strong></div>
+              <div><span>Approve order</span><strong>Short, clear YES from the operator’s number</strong></div>
+              <div><span>Resolve incident</span><strong>Real inbound text must be cited</strong></div>
+              <div><span>Security limit</span><strong>API callers could still insert a text claiming the operator’s number</strong></div>
+            </div>
+          </section>
+        </main>
+
+        <footer><span>Forge Flow · MHacks 2026</span><p>Supplier data is mock · Payment is simulated · ETA is a rough estimate · Health is not a failure probability</p></footer>
+      </div>
+    </div>
+    <script src="app.js"></script>
+    <script src="live.js"></script>
+  </body>
+</html>

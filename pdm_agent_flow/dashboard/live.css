@@ -1,0 +1,20 @@
+/* Live-data mode: wired to SpacetimeDB through dashboard_server.py (live.js). */
+.live-status { padding: 6px 8px; color: var(--muted); background: #171e1c; font-size: 9px; white-space: nowrap; }
+.live-status.ok { color: var(--green); background: rgba(98,220,146,.08); }
+.live-status.stale { color: var(--yellow); background: rgba(244,201,93,.08); }
+.live-status.down { color: var(--red); background: rgba(255,98,98,.08); }
+body.live .local-only { display: none; }
+body.live #baseline-button, body.live #monitor-button { display: none; }
+.status-dot.offline { background: var(--red); }
+.decision-banner > div.pending-result { background: rgba(244,201,93,.07); }
+.decision-banner > div.pending-result strong { color: var(--yellow); }
+.decision-banner > div.rejected-result { background: rgba(255,98,98,.07); }
+.decision-banner > div.rejected-result strong { color: var(--red); }
+.decision-banner > div.idle-result { background: transparent; }
+.decision-banner > div.idle-result strong { color: var(--muted); }
+.supplier-row.unavailable { opacity: .45; }
+.supplier-row.empty { color: var(--muted); }
+body.live .messages { max-height: 470px; overflow-y: auto; scroll-behavior: smooth; }
+body.live .bubble { white-space: pre-wrap; overflow-wrap: anywhere; }
+.bubble.pending { opacity: .55; }
+.conversation-events p { overflow-wrap: anywhere; }
